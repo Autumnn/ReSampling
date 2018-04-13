@@ -1,6 +1,6 @@
 import numpy as np
 
-a = np.random.randint(0,2,10)
-
+a = np.arange(6).reshape(2,3)
 print(a)
-print(len(a.nonzero()[0]))
+b = np.argmax(a)
+print(b)

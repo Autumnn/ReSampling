@@ -1,6 +1,6 @@
 import numpy as np
 
-file = "G_Result_UCI.txt"
+file = "G_Result.txt"
 i = 0
 with open(file, "r") as r:
     print(r.name)
@@ -8,8 +8,8 @@ with open(file, "r") as r:
         column = line.split("\t")
         data_set = column[0]
         method = column[1]
-        mean = float(column[7])
-        var = float(column[8].strip())
+        mean = round(float(column[7]),4)
+        var = round(float(column[8].strip()),3)
         if i == 0 :
             dic = {data_set:{method:[mean, var]}}
             temp = data_set
