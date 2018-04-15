@@ -8,152 +8,162 @@ import os
 import cGANStructure
 from imblearn.metrics import geometric_mean_score, specificity_score
 
-
-#  first "min_max_scalar" ant then "StratifiedKFold".
-
-path = "UCI_npz"
-files= os.listdir(path) #Get files in the folder
+path = "UCI_Cross_Folder_npz"
+dirs = os.listdir(path) #Get files in the folder
 First_line = True
-for file in files:
-    print("File Name: ", file)
-    name = file.split(".")[0]
-    dir = path + "/" + file
-    r = np.load(dir)
 
-    Positive_Features = r["P_F"]
-    Num_Positive = Positive_Features.shape[0]
-    Positive_Labels = np.linspace(1,1,Num_Positive)
-    Negative_Features = r["N_F"]
-    Num_Negative = Negative_Features.shape[0]
-    Negative_Labels = np.linspace(0,0,Num_Negative)
-    Num_Features = Positive_Features.shape[1]
-
-    Features = np.concatenate((Positive_Features, Negative_Features))
-    Labels = np.concatenate((Positive_Labels, Negative_Labels))
-
-    min_max_scalar = preprocessing.MinMaxScaler()
-    Re_Features = min_max_scalar.fit_transform(Features)
+for Dir in dirs:
+    print("Data Set Name: ", Dir)
+    dir_path = path + "/" + Dir
+    files= os.listdir(dir_path) #Get files in the folder
 
     Num_Gamma = 12
     gamma = np.logspace(-2, 1, Num_Gamma)
     Num_C = 6
     C = np.logspace(-1, 4, Num_C)
-    Accuracy = np.zeros((Num_Gamma, Num_C))
-    Precision = np.zeros((Num_Gamma, Num_C))
-    Recall = np.zeros((Num_Gamma, Num_C))
-    Specificity = np.zeros((Num_Gamma, Num_C))
-    G_Mean = np.zeros((Num_Gamma, Num_C))
-    F_Mean = np.zeros((Num_Gamma, Num_C))
-    AUC = np.zeros((Num_Gamma, Num_C))
+    Num_Cross_Folders = 5
+    Accuracy = np.zeros((Num_Gamma, Num_C, Num_Cross_Folders))
+    Precision = np.zeros((Num_Gamma, Num_C, Num_Cross_Folders))
+    Recall = np.zeros((Num_Gamma, Num_C,Num_Cross_Folders))
+    Specificity = np.zeros((Num_Gamma, Num_C, Num_Cross_Folders))
+    G_Mean = np.zeros((Num_Gamma, Num_C, Num_Cross_Folders))
+    F_Mean = np.zeros((Num_Gamma, Num_C, Num_Cross_Folders))
+    AUC = np.zeros((Num_Gamma, Num_C, Num_Cross_Folders))
 
-    for j in range(Num_Gamma):
-        for k in range(Num_C):
-            # print("gamma = ", str(gamma[j]), " C = ", str(C[k]))
+    i = 0
+    for file in files:
+        name = dir_path + '/' + file
+        r = np.load(name)
 
-            Num_Cross_Folders = 5
-            #skf = StratifiedKFold(n_splits=Num_Cross_Folders, shuffle=True)
-            skf = StratifiedKFold(n_splits=Num_Cross_Folders, shuffle=False)
-            Accuracy_temp = np.linspace(0,0,Num_Cross_Folders)
-            Precision_temp = np.linspace(0,0,Num_Cross_Folders)
-            Recall_temp = np.linspace(0,0,Num_Cross_Folders)
-            Specificity_temp = np.linspace(0,0,Num_Cross_Folders)
-            G_Mean_temp = np.linspace(0,0,Num_Cross_Folders)
-            F_Mean_temp = np.linspace(0,0,Num_Cross_Folders)
-            AUC_temp = np.linspace(0,0,Num_Cross_Folders)
+        Positive_Features_train = r["P_F_tr"]
+        Num_Positive_train = Positive_Features_train.shape[0]
+        Positive_Labels_train = np.linspace(1, 1, Num_Positive_train)
 
-            i = 0
-            for train_index, test_index in skf.split(Re_Features, Labels):
-                Feature_train_o, Feature_test = Re_Features[train_index], Re_Features[test_index]
-                Label_train_o, Label_test = Labels[train_index], Labels[test_index]
-                num_positive = np.array(np.nonzero(Label_train_o)).shape[1]
-                num_negative = Label_train_o.shape[0] - num_positive
+        Positive_Features_test = r["P_F_te"]
+        Num_Positive_test = Positive_Features_test.shape[0]
+        Positive_Labels_test = np.linspace(1, 1, Num_Positive_test)
 
-                input_dim, G_dense, D_dense = cGANStructure.Structure(name)  # for UCI data
-                #    input_dim = 10
-                #    G_dense = 300
-                #    D_dense = 150
+        Negative_Features_train = r["N_F_tr"]
+        Num_Negative_train = Negative_Features_train.shape[0]
+        Negative_Labels_train = np.linspace(0, 0, Num_Negative_train)
 
-                Pre_train_epoches = 100
-                Train_epoches = 10000
-                Model_name = "cGAN_" + name + "_G-dense_" + str(G_dense) + "_pretrain_" + str(
-                    Pre_train_epoches) + "_D-dense_" + str(D_dense) + "_epoches_" + str(Train_epoches) + ".h5"
-                Model_path = "UCI_cGAN_Model"
-                model = load_model(Model_path + "/" + Model_name)
+        Negative_Features_test = r["N_F_te"]
+        Num_Negative_test = Negative_Features_test.shape[0]
+        Negative_Labels_test = np.linspace(0, 0, Num_Negative_test)
 
-                num_create_samples = num_negative - num_positive
-                Noise_Input = np.random.uniform(0, 1, size=[num_create_samples, input_dim])
-                condition_samples = np.linspace(1, 1, num_create_samples)
+        print(i, " folder; ", "Po_tr: ", Num_Positive_train, "Ne_tr: ", Num_Negative_train,
+              "Po_te: ", Num_Positive_test, "Ne_te: ", Num_Negative_test)
 
-                sudo_Samples = model.predict([Noise_Input, condition_samples])
-                Feature_train = np.concatenate((Feature_train_o, sudo_Samples))
-                Label_train = np.concatenate((Label_train_o, condition_samples))
+        Features_train_o = np.concatenate((Positive_Features_train, Negative_Features_train))
+        Labels_train_o = np.concatenate((Positive_Labels_train, Negative_Labels_train))
+        #                print(Labels_train_o)
+        Feature_test = np.concatenate((Positive_Features_test, Negative_Features_test))
+        Label_test = np.concatenate((Positive_Labels_test, Negative_Labels_test))
+
+        input_dim, G_dense, D_dense = cGANStructure.Structure(Dir)  # for UCI data
+        #    input_dim = 10
+        #    G_dense = 300
+        #    D_dense = 150
+
+        Pre_train_epoches = 100
+        Train_epoches = 10000
+        Model_name = "cGAN_" + Dir + "_folder_" + str(i) + "_G-dense_" + str(G_dense) + "_pretrain_" + str(
+            Pre_train_epoches) + "_D-dense_" + str(D_dense) + "_epoches_" + str(Train_epoches) + ".h5"
+        Model_path = "UCI_cross_folder_cGAN_Model"
+        model = load_model(Model_path + "/" + Model_name)
+
+        expand_rate_for_Majority = 0.5
+        num_create_samples = int(np.ceil(Num_Negative_train * expand_rate_for_Majority))
+#        num_create_samples = Num_Negative_train - Num_Positive_train
+        Noise_Input = np.random.uniform(0, 1, size=[num_create_samples, input_dim])
+        condition_samples = np.linspace(0, 0, num_create_samples)
+#        condition_samples = np.linspace(1, 1, num_create_samples)
+
+        sudo_Samples = model.predict([Noise_Input, condition_samples])
+        Feature_train = np.concatenate((Features_train_o, sudo_Samples))
+        Label_train = np.concatenate((Labels_train_o, condition_samples))
+
+        for j in range(Num_Gamma):
+            for k in range(Num_C):
+                # print("gamma = ", str(gamma[j]), " C = ", str(C[k]))
 
                 clf = svm.SVC(C=C[k], kernel='rbf', gamma=gamma[j])
                 clf.fit(Feature_train, Label_train)
                 Label_predict = clf.predict(Feature_test)
 
-                Accuracy_temp[i] = metrics.accuracy_score(Label_test, Label_predict)
-                Precision_temp[i] = metrics.precision_score(Label_test, Label_predict)
-                Recall_temp[i] = metrics.recall_score(Label_test, Label_predict)
-                Specificity_temp[i] = specificity_score(Label_test, Label_predict)
-                G_Mean_temp[i] = geometric_mean_score(Label_test, Label_predict)
-                F_Mean_temp[i] = metrics.f1_score(Label_test, Label_predict)
+                Accuracy[j, k, i] = metrics.accuracy_score(Label_test, Label_predict)
+                Precision[j, k, i] = metrics.precision_score(Label_test, Label_predict)
+                Recall[j, k, i] = metrics.recall_score(Label_test, Label_predict)
+                Specificity[j, k, i] = specificity_score(Label_test, Label_predict)
+                G_Mean[j, k, i] = geometric_mean_score(Label_test, Label_predict)
+                F_Mean[j, k, i] = metrics.f1_score(Label_test, Label_predict)
                 Label_score = clf.decision_function(Feature_test)
-                AUC_temp[i] = metrics.roc_auc_score(Label_test, Label_score)
-                i += 1
+                AUC[j, k, i] = metrics.roc_auc_score(Label_test, Label_score)
 
-            Accuracy[j, k] = np.mean(Accuracy_temp)
-            Precision[j, k] = np.mean(Precision_temp)
-            Recall[j, k] = np.mean(Recall_temp)
-            Specificity[j, k] = np.mean(Specificity_temp)
-            G_Mean[j, k] = np.mean(G_Mean_temp)
-            F_Mean[j, k] = np.mean(F_Mean_temp)
-            AUC[j, k] = np.mean(AUC_temp)
+
+        i += 1
+
+    Accuracy_t = np.zeros((Num_Gamma, Num_C))
+    Precision_t = np.zeros((Num_Gamma, Num_C))
+    Recall_t = np.zeros((Num_Gamma, Num_C))
+    Specificity_t = np.zeros((Num_Gamma, Num_C))
+    G_Mean_t = np.zeros((Num_Gamma, Num_C))
+    F_Mean_t = np.zeros((Num_Gamma, Num_C))
+    AUC_t = np.zeros((Num_Gamma, Num_C))
+
+    for j in range(Num_Gamma):
+        for k in range(Num_C):
+            Accuracy_t[j,k] = np.mean(Accuracy[j,k,:])
+            Precision_t[j,k] = np.mean(Precision[j,k,:])
+            Recall_t[j,k] = np.mean(Recall[j,k,:])
+            Specificity_t[j,k] = np.mean(Specificity[j,k,:])
+            G_Mean_t[j,k] = np.mean(G_Mean[j,k,:])
+            F_Mean_t[j,k] = np.mean(F_Mean[j,k,:])
+            AUC_t[j,k] = np.mean(AUC[j,k,:])
 
     file_wirte = "Result.txt"
     with open(file_wirte,'a') as w:
-        if First_line:
-            metrics_list = ["Accuracy", "Precision", "Recall", "Specificity", "G-mean", "F-mean", "AUC"]
-            first_line = "dataset" + '\t' + "method" + '\t' + '\t'.join(str(x) + '\t' + 'parameters' for x in metrics_list) + '\n'
-            w.write(first_line)
-            First_line = False
+        #if First_line:
+        #    metrics_list = ["Accuracy", "Precision", "Recall", "Specificity", "G-mean", "F-mean", "AUC"]
+        #    first_line = "dataset" + '\t' + "method" + '\t' + '\t'.join(str(x) + '\t' + 'parameters' for x in metrics_list) + '\n'
+        #    w.write(first_line)
+        #    First_line = False
 
-        else:
-            line = name + '\t' + "cGAN" + '\t'
-            accuracy = np.max(Accuracy)
-            accuracy_parameters = np.argwhere(Accuracy == accuracy)
-            line += str(accuracy) + '\t' + str('%.3f'% gamma[accuracy_parameters[0][0]]) + \
-                    ',' + str('%.3f'% C[accuracy_parameters[0][1]]) + '\t'
+        line = Dir + '\t' + "cGAN-O" + '\t'
+        accuracy = np.max(Accuracy_t)
+        accuracy_parameters = np.argwhere(Accuracy_t == accuracy)
+        line += str(accuracy) + '\t' + str('%.3f'% gamma[accuracy_parameters[0][0]]) + \
+                ',' + str('%.3f'% C[accuracy_parameters[0][1]]) + '\t'
 
-            precision = np.max(Precision)
-            precision_parameters = np.argwhere(Precision == precision)
-            line += str(precision) + '\t' + str('%.3f'% gamma[precision_parameters[0][0]]) + \
-                    ',' + str('%.3f'% C[precision_parameters[0][1]]) + '\t'
+        precision = np.max(Precision_t)
+        precision_parameters = np.argwhere(Precision_t == precision)
+        line += str(precision) + '\t' + str('%.3f'% gamma[precision_parameters[0][0]]) + \
+                ',' + str('%.3f'% C[precision_parameters[0][1]]) + '\t'
 
-            recall = np.max(Recall)
-            recall_parameters = np.argwhere(Recall == recall)
-            line += str(recall) + '\t' + str('%.3f'% gamma[recall_parameters[0][0]]) + \
-                    ',' + str('%.3f'% C[recall_parameters[0][1]]) + '\t'
+        recall = np.max(Recall_t)
+        recall_parameters = np.argwhere(Recall_t == recall)
+        line += str(recall) + '\t' + str('%.3f'% gamma[recall_parameters[0][0]]) + \
+                ',' + str('%.3f'% C[recall_parameters[0][1]]) + '\t'
 
-            specificity = np.max(Specificity)
-            specificity_parameters = np.argwhere(Specificity == specificity)
-            line += str(specificity) + '\t' + str('%.3f'% gamma[specificity_parameters[0][0]]) + \
-                    ',' + str('%.3f'% C[specificity_parameters[0][1]]) + '\t'
+        specificity = np.max(Specificity_t)
+        specificity_parameters = np.argwhere(Specificity_t == specificity)
+        line += str(specificity) + '\t' + str('%.3f'% gamma[specificity_parameters[0][0]]) + \
+                ',' + str('%.3f'% C[specificity_parameters[0][1]]) + '\t'
 
-            g_mean = np.max(G_Mean)
-            g_parameters = np.argwhere(G_Mean == g_mean)
-            line += str(g_mean) + '\t' + str('%.3f'% gamma[g_parameters[0][0]]) + \
-                    ',' + str('%.3f'% C[g_parameters[0][1]]) + '\t'
+        g_mean = np.max(G_Mean_t)
+        g_parameters = np.argwhere(G_Mean_t == g_mean)
+        line += str(g_mean) + '\t' + str('%.3f'% gamma[g_parameters[0][0]]) + \
+                ',' + str('%.3f'% C[g_parameters[0][1]]) + '\t'
 
-            f_mean = np.max(F_Mean)
-            f_parameters = np.argwhere(F_Mean == f_mean)
-            line += str(f_mean) + '\t' + str('%.3f'% gamma[f_parameters[0][0]]) + \
-                    ',' + str('%.3f'% C[f_parameters[0][1]]) + '\t'
+        f_mean = np.max(F_Mean_t)
+        f_parameters = np.argwhere(F_Mean_t == f_mean)
+        line += str(f_mean) + '\t' + str('%.3f'% gamma[f_parameters[0][0]]) + \
+                ',' + str('%.3f'% C[f_parameters[0][1]]) + '\t'
 
-            auc = np.max(AUC)
-            auc_parameters = np.argwhere(AUC == auc)
-            line += str(auc) + '\t' + str('%.3f'% gamma[auc_parameters[0][0]]) + \
-                    ',' + str('%.3f'% C[auc_parameters[0][1]]) + '\n'
+        auc = np.max(AUC_t)
+        auc_parameters = np.argwhere(AUC_t == auc)
+        line += str(auc) + '\t' + str('%.3f'% gamma[auc_parameters[0][0]]) + \
+                ',' + str('%.3f'% C[auc_parameters[0][1]]) + '\n'
 
-            w.write(line)
+        w.write(line)
 

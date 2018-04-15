@@ -1,11 +1,12 @@
 import numpy as np
 
 
-a = np.arange(12).reshape(4,3)
+a = np.arange(36).reshape(4,3,3)
 print(a)
-b = np.max(a)
-print(b)
-i = np.argwhere(a == b)
+b = np.zeros((4,3))
+for i in range(4):
+    for j in range(3):
+        b[i,j] = np.mean(a[i,j,:])
 
-print(i[0][0])
-print(i[0][1])
+print(b)
+
