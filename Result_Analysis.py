@@ -163,5 +163,5 @@ with open(file_write, 'a') as w:
         for i in range(len(l_m)):
             w_line += '\t' + str('%.4f' % l_m[i])
             w_line += '\t' + str(len(l_m)-seq.index(l_m[i]))
-        w_line += '\n' + '\n'
+        w_line += '\n'
         w.write(w_line)
