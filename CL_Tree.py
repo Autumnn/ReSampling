@@ -1,8 +1,9 @@
 import os
 import numpy as np
 import networkx as nx
+import matplotlib.pyplot as plt
 
-file = "UCI_Cross_Folder_npz/segment/segment_0_Cross_Folder.npz"
+file = "UCI_Cross_Folder_npz/ecoli/ecoli_1_Cross_Folder.npz"
 r = np.load(file)
 Positive_Features_train = r["P_F_tr"]
 Num_Positive_train = Positive_Features_train.shape[0]
@@ -65,10 +66,14 @@ G = nx.Graph()
 for i in range(num_features-1):
     G.add_node(i)
     for j in range(i+1,num_features):
-        G.add_edge(j, i, weight=-calculate_mutual_information(i, j))
+        G.add_edge(j, i, weight=calculate_mutual_information(i, j))
 
-T = nx.minimum_spanning_tree(G)
-print(list(T.edges()))
+T = nx.maximum_spanning_tree(G)
+
+#nx.draw_networkx(T)
+#plt.show()
+
+print(sorted(T.edges(data=True)))
 
 
 
