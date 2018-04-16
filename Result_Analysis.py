@@ -1,6 +1,6 @@
 import numpy as np
 
-file = "Result_1.txt"
+file = "Result.txt"
 i = 0
 with open(file, "r") as r:
     print(r.name)
