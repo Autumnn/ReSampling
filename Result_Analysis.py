@@ -1,6 +1,6 @@
 import numpy as np
 
-file = "Result.txt"
+file = "Result_1.txt"
 i = 0
 with open(file, "r") as r:
     print(r.name)
@@ -63,8 +63,7 @@ with open(file_write, 'a') as w:
             w_line += '\t' + str(len(l_m)-seq.index(l_m[i]))
         w_line += '\n'
         w.write(w_line)
-    w_line += '\n'
-    w.write(w_line)
+    w.write('\n')
 
     head_line = "Precision" + '\t' + '\t'.join(str(x) + '\t' for x in method_list) + '\n'
     w.write(head_line)
@@ -80,8 +79,7 @@ with open(file_write, 'a') as w:
             w_line += '\t' + str(len(l_m)-seq.index(l_m[i]))
         w_line += '\n'
         w.write(w_line)
-    w_line += '\n'
-    w.write(w_line)
+    w.write('\n')
 
     head_line = "Recall" + '\t' + '\t'.join(str(x) + '\t' for x in method_list) + '\n'
     w.write(head_line)
@@ -97,8 +95,7 @@ with open(file_write, 'a') as w:
             w_line += '\t' + str(len(l_m)-seq.index(l_m[i]))
         w_line += '\n'
         w.write(w_line)
-    w_line += '\n'
-    w.write(w_line)
+    w.write('\n')
 
     head_line = "Specificity" + '\t' + '\t'.join(str(x) + '\t' for x in method_list) + '\n'
     w.write(head_line)
@@ -114,8 +111,7 @@ with open(file_write, 'a') as w:
             w_line += '\t' + str(len(l_m)-seq.index(l_m[i]))
         w_line += '\n'
         w.write(w_line)
-    w_line += '\n'
-    w.write(w_line)
+    w.write('\n')
 
     head_line = "G-mean" + '\t' + '\t'.join(str(x) + '\t' for x in method_list) + '\n'
     w.write(head_line)
@@ -131,8 +127,7 @@ with open(file_write, 'a') as w:
             w_line += '\t' + str(len(l_m)-seq.index(l_m[i]))
         w_line += '\n'
         w.write(w_line)
-    w_line += '\n'
-    w.write(w_line)
+    w.write('\n')
 
     head_line = "F-mean" + '\t' + '\t'.join(str(x) + '\t' for x in method_list) + '\n'
     w.write(head_line)
@@ -148,8 +143,7 @@ with open(file_write, 'a') as w:
             w_line += '\t' + str(len(l_m)-seq.index(l_m[i]))
         w_line += '\n'
         w.write(w_line)
-    w_line += '\n'
-    w.write(w_line)
+    w.write('\n')
 
     head_line = "AUC" + '\t' + '\t'.join(str(x) + '\t' for x in method_list) + '\n'
     w.write(head_line)
