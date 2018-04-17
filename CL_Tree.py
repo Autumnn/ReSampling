@@ -2,8 +2,9 @@ import os
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
+from pomegranate import BayesianNetwork
 
-file = "UCI_Cross_Folder_npz/Breast/Breast_1_Cross_Folder.npz"
+file = "UCI_Cross_Folder_npz/ecoli/ecoli_1_Cross_Folder.npz"
 r = np.load(file)
 Positive_Features_train = r["P_F_tr"]
 Num_Positive_train = Positive_Features_train.shape[0]
@@ -91,6 +92,19 @@ while len(T.nodes()) > 0:
 
 print(dependency)
 
+
+#bayes = BayesianNetwork.from_samples(Positive_Features_train, algorithm='chow-liu', root=num_features-1)
+#depend = []
+#for i in bayes.structure:
+#    if i:
+#        depend.append(i[0])
+#    else:
+#        depend.append(-1)
+
+#print(depend)
+
+
+
 initial = True
 for i in range(len(dependency)):
     if dependency[i] != -1:
@@ -112,12 +126,13 @@ for i in range(len(dependency)):
                 else:
                     conditional_probability[i_dval, i_ival] = marginal_pair_distribution[(d, i)][i_dval, i_ival] \
                                                               / sum(marginal_pair_distribution[(d, i)][i_dval, :])
-            print(sum(conditional_probability[i_dval,:]), i)
+#            print(sum(conditional_probability[i_dval,:]), i)
     else:
         conditional_probability = marginal_distribution[:,i]
 
     if initial:
         Prob = {i:conditional_probability}
+        initial = False
     else:
         Prob[i] = conditional_probability
 
@@ -127,32 +142,61 @@ for i in range(len(dependency)):
 #num_create_sample = 10
 #for i in range(num_create_sample):
 
-def NumFactor(z, index):
+def NumFactor(z):
     prob = 1
     for i in range(num_features):
         cur_val = z[i]
-        d = dependency[i]
+        d = int(dependency[i])
         if d == -1:
-            pr = Prob[i][index]
+            pr = Prob[i][cur_val]
         else:
-            d_index = int((z[d]+0.005)/0.01)
-            pr = Prob[i][d_index, index]
+            d_index = int(z[d])
+            pr = Prob[i][d_index, cur_val]
 
         prob = prob * pr
 
     return prob
 
 
-Z = Positive_Features_train[0,:]
-T = 100
+Z = np.floor(Positive_Features_train[0,:]*100)
+Z = Z.astype(int)
+print Z
+T = 300
 
 Z_temp = Z
 for t in range(T):
     for i in range(num_features):
         probability = np.linspace(0,0,num_bins)
         for j in range(num_bins):
-            Z_temp[i] = 0.01*j - 0.005
-            probability[j] = NumFactor(Z_temp, j)
+            Z_temp[i] = j
+            probability[j] = NumFactor(Z_temp)
+
+        p_sum = sum(probability)
+#        print(p_sum)
+        probability = probability/p_sum
+#        print(probability)
+
+        u = np.random.random_sample()
+#        print("u", u)
+        add = 0
+        for j in range(num_bins):
+            add += probability[j]
+#            print("add", add)
+            if u <= add:
+                new_z_i = j
+#                print("add", add)
+                break
+
+        Z_temp[i] = new_z_i
+
+    if t>100 & t%20==0:
+        sample = np.linspace(0,0,num_features)
+        for j in range(num_features):
+            u_r = np.random.random_sample()
+            sample[j] = Z_temp[j]*0.01 + u_r*0.01
+        print(sample)
+
+
 
 
 
