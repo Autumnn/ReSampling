@@ -61,22 +61,31 @@ class Chow_Liu_Tree():
             for j in range(i + 1, self.num_features):
                 g.add_edge(j, i, weight=-self.calculate_mutual_information(i, j))
 
-        tree = nx.minimum_spanning_tree(
-            g)  # minimum_spanning_tree use Kruskal algorithm, but maximum_spanning_tree use Boruvka's algorithm
+        tree = nx.minimum_spanning_tree(g)
+        # minimum_spanning_tree use Kruskal algorithm, but maximum_spanning_tree use Boruvka's algorithm
         print("Dependency Tree has been built, tree edges are: ")
         print(tree.edges())
 
         self.dependency = np.linspace(0, 0, self.num_features)
         self.dependency[self.num_features - 1] = -1  # Root node
         leaf = [self.num_features - 1]
-        while len(T.nodes()) > 0:
+        while len(tree.nodes()) > 0:
             for node in leaf:
-                if node in T.nodes():
-                    for nb in nx.all_neighbors(T, node):
+                if node in tree.nodes():
+                    for nb in nx.all_neighbors(tree, node):
                         self.dependency[int(nb)] = node
                         leaf.append(nb)
-                    T.remove_node(node)
+                    tree.remove_node(node)
                 leaf.remove(node)
 
-        print(dependency)
-        return self.d
+        print("Dependency: ", self.dependency)
+        return self.dependency
+
+    def get_marginal_distribution(self):
+        return self.marginal_distribution
+
+    def get_marginal_bound(self):
+        return self.marginal_bounds
+
+    def get_marginal_pair_distribution(self):
+        return self.marginal_pair_distribution
