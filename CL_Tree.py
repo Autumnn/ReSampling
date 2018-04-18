@@ -2,7 +2,6 @@ import os
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
-from pomegranate import BayesianNetwork
 
 file = "UCI_Cross_Folder_npz/ecoli/ecoli_1_Cross_Folder.npz"
 r = np.load(file)
@@ -160,7 +159,7 @@ def NumFactor(z):
 
 Z = np.floor(Positive_Features_train[0,:]*100)
 Z = Z.astype(int)
-print Z
+print(Z)
 T = 300
 
 Z_temp = Z
