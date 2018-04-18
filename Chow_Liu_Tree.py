@@ -32,6 +32,7 @@ class Chow_Liu_Tree():
         print("Number of Features: ", self.num_features)
         self.num_bins = num_bins
         self.marginal_distribution = np.zeros((self.num_bins, self.num_features))
+        self.marginal_bounds = np.zeros((self.num_bins+1, self.num_features))
 
         for i in range(self.num_features):
             self.marginal_distribution[:, i] = np.histogram(data[:, i], bins=self.num_bins)[

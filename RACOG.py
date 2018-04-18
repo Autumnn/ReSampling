@@ -17,7 +17,7 @@ class RACOG():
         self.conditional_probability = []
         self.Prob = {}
 
-    def fit(self, data, num_bins):
+    def fit(self, data, num_bins=100):
 
         self.num_samples = data.shape[0]
         self.num_features = data.shape[1]
@@ -61,7 +61,7 @@ class RACOG():
     def num_factor(self, z):
         prob = 1
         for i in range(self.num_features):
-            cur_val = z[i]
+            cur_val = int(z[i])
             d = int(self.dependency[i])
             if d == -1:
                 pr = self.Prob[i][cur_val]
@@ -75,14 +75,18 @@ class RACOG():
 
     def samples(self, minority_data, num_create_samples, burn_in=100, lag=20):
         self.num_create_samples = num_create_samples
+        create_samples = np.zeros((self.num_create_samples, self.num_features))
         minority_size = minority_data.shape[0]
-        epoch = np.ceil(num_create_samples/minority_size)*20 + 100 +1
+        epoch = np.ceil(num_create_samples/minority_size)*lag + burn_in + 1
+        epoch = epoch.astype(int)
 
         z = np.linspace(0,0,self.num_features)
         for k in range(minority_size):
             initial_sample = minority_data[k]
             for i in range(self.num_features):
                 z[i] = np.max(np.where(self.marginal_bounds[:,i] <= initial_sample[i])[0])
+                if z[i] > 99:
+                    z[i] -= 1
 
             for t in range(epoch):
                 for i in range(self.num_features):
@@ -99,22 +103,39 @@ class RACOG():
                     u = np.random.random_sample()
                     #        print("u", u)
                     add = 0
+                    not_found = True
                     for j in range(self.num_bins):
                         add += probability[j]
                         #            print("add", add)
                         if u <= add:
                             new_z_i = j
                             #                print("add", add)
+                            not_found = False
                             break
+
+                    if not_found:
+                        new_z_i = self.num_bins - 1
+                        print("Warining! Random seed is too large:", u)
 
                     z[i] = new_z_i
 
-                if t > burn_in & t % lag == 0:
+                if t > burn_in and t % lag == 0:
                     sample = np.linspace(0, 0, self.num_features)
                     for j in range(self.num_features):
                         u_r = np.random.random_sample()
-           ##             sample[j] = Z_temp[j] * 0.01 + u_r * 0.01
-                    print(sample)
+                        k = int(z[j])
+                        a = self.marginal_bounds[k,j]
+                        b = self.marginal_bounds[k+1, j]
+                        sample[j] = (b - a) * u_r + a
+
+                    i_t = (np.floor((t - burn_in)/lag) - 1) * minority_size
+                    i_p = int(i_t + k)
+                    if i_p < self.num_create_samples:
+                        create_samples[i_p] = sample
+
+        return create_samples
+
+
 
 
 
