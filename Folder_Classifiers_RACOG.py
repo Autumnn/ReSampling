@@ -66,6 +66,7 @@ for Dir in dirs:
 
         racog = RACOG()
         racog.fit(Positive_Features_train)
+        print("RACOG fit() completed, sampling ...")
         sudo_Samples = racog.samples(Positive_Features_train, num_create_samples)
         Feature_train = np.concatenate((Features_train_o, sudo_Samples))
         Label_train = np.concatenate((Labels_train_o, condition_samples))
