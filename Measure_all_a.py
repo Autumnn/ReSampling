@@ -79,7 +79,7 @@ for it in range(5):
                 elif m == "SMOTE-SMOTE":
                     expand_rate_for_Majority = 0.5
                     num_create_samples = int(np.ceil(Num_Negative_train * expand_rate_for_Majority))
-                    em = SMOTE(ratio={0:num_create_samples})
+                    em = SMOTE(ratio={0:num_create_samples+Num_Negative_train})
                     Re_Features_o, Labels_o = em.fit_sample(Features_train_o, Labels_train_o)
                     sm = SMOTE()
                     Feature_train, Label_train = sm.fit_sample(Re_Features_o, Labels_o)
@@ -109,7 +109,7 @@ for it in range(5):
                 elif m == "SMOTE-cGAN":
                     expand_rate_for_Majority = 0.5
                     num_create_samples = int(np.ceil(Num_Negative_train * expand_rate_for_Majority))
-                    em = SMOTE(ratio={0:num_create_samples})
+                    em = SMOTE(ratio={0:num_create_samples+Num_Negative_train})
                     Re_Features_o, Labels_o = em.fit_sample(Features_train_o, Labels_train_o)
                     input_dim, G_dense, D_dense = cGANStructure.Structure(Dir)  # for UCI data
                     Pre_train_epoches = 100
