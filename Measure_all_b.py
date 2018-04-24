@@ -19,7 +19,7 @@ for Dir in dirs:
     f_i = 0
     par_a = []
     par_b = []
-    methods = ["cGAN-SMOTE", "SVM", "SMOTE", "cGAN", "SMOTE-SMOTE", "cGAN-cGAN", "SMOTE-cGAN"]
+    methods = ["SVM", "SMOTE", "cGAN", "SMOTE-SMOTE", "cGAN-cGAN", "SMOTE-cGAN"]
     for m in methods:
         Num_Gamma = 12
         gamma = np.logspace(-2, 1, Num_Gamma)
@@ -173,7 +173,7 @@ for Dir in dirs:
             par_a, par_b = ml_record.index_find()
         f_i += 1
 
-        file_wirte = "Result_b.txt"
+        file_wirte = "Result_b_1.txt"
         ml_record.output_b(file_wirte, m, Dir, par_a, par_b)
 
 

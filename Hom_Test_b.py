@@ -49,12 +49,13 @@ with open(file, "r") as r:
         i += 1
 
 method_list = list(AUC[temp].keys())
+print(method_list)
 
 #list = [Accuracy, Precision, Recall, Specificity, G_mean, F_mean, AUC]
 
 #for ll_i in list:
 i = 0
-for key, values in AUC.items():
+for key, values in F_mean.items():
     # print(values)   key: dataset name
     l_m = []
     for k, v in values.items():         # k: method name
