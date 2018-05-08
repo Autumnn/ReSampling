@@ -1,7 +1,7 @@
 import numpy as np
 
 
-file = "Result_b.txt"
+file = "Result_LightGBM_KSMOTE.txt"
 #    file = "Result_a_" + str(f_i) + ".txt"
 i = 0
 with open(file, "r") as r:
@@ -48,7 +48,7 @@ with open(file, "r") as r:
 
 method_list = AUC[temp].keys()
 
-file_write = "Result_UCI_bb_Analysis.txt"
+file_write = "Result_KSMOTE_LightGBM_Analysis.txt"
 with open(file_write, 'a') as w:
     head_line = "Accuracy" + '\t' + '\t'.join(str(x) + '\t' for x in method_list) + '\n'
     w.write(head_line)
@@ -63,9 +63,9 @@ with open(file_write, 'a') as w:
         w_line = key
         for i in range(len(l_m)):
             w_line += '\t' + str('%.4f' % l_m[i])
-#            w_line += '\t' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0]))
-            w_line += '(' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0])) + ')'
-            w_line += '\t' + str('%.4f' % l_v[i])
+            w_line += '\t' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0]))
+#            w_line += '(' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0])) + ')'
+#            w_line += '\t' + str('%.4f' % l_v[i])
         w_line += '\n'
         w.write(w_line)
     w.write('\n')
@@ -83,9 +83,9 @@ with open(file_write, 'a') as w:
             w_line = key
             for i in range(len(l_m)):
                 w_line += '\t' + str('%.4f' % l_m[i])
-#                w_line += '\t' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0]))
-                w_line += '(' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0])) + ')'
-                w_line += '\t' + str('%.4f' % l_v[i])
+                w_line += '\t' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0]))
+#                w_line += '(' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0])) + ')'
+#                w_line += '\t' + str('%.4f' % l_v[i])
         w_line += '\n'
         w.write(w_line)
     w.write('\n')
@@ -103,9 +103,9 @@ with open(file_write, 'a') as w:
             w_line = key
             for i in range(len(l_m)):
                 w_line += '\t' + str('%.4f' % l_m[i])
-#                w_line += '\t' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0]))
-                w_line += '(' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0])) + ')'
-                w_line += '\t' + str('%.4f' % l_v[i])
+                w_line += '\t' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0]))
+#                w_line += '(' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0])) + ')'
+#                w_line += '\t' + str('%.4f' % l_v[i])
         w_line += '\n'
         w.write(w_line)
     w.write('\n')
@@ -123,9 +123,9 @@ with open(file_write, 'a') as w:
             w_line = key
             for i in range(len(l_m)):
                 w_line += '\t' + str('%.4f' % l_m[i])
-#                w_line += '\t' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0]))
-                w_line += '(' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0])) + ')'
-                w_line += '\t' + str('%.4f' % l_v[i])
+                w_line += '\t' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0]))
+#                w_line += '(' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0])) + ')'
+#                w_line += '\t' + str('%.4f' % l_v[i])
         w_line += '\n'
         w.write(w_line)
     w.write('\n')
@@ -143,9 +143,9 @@ with open(file_write, 'a') as w:
             w_line = key
             for i in range(len(l_m)):
                 w_line += '\t' + str('%.4f' % l_m[i])
-#                w_line += '\t' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0]))
-                w_line += '(' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0])) + ')'
-                w_line += '\t' + str('%.4f' % l_v[i])
+                w_line += '\t' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0]))
+#                w_line += '(' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0])) + ')'
+#                w_line += '\t' + str('%.4f' % l_v[i])
         w_line += '\n'
         w.write(w_line)
     w.write('\n')
@@ -163,9 +163,9 @@ with open(file_write, 'a') as w:
             w_line = key
             for i in range(len(l_m)):
                 w_line += '\t' + str('%.4f' % l_m[i])
-#                w_line += '\t' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0]))
-                w_line += '(' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0])) + ')'
-                w_line += '\t' + str('%.4f' % l_v[i])
+                w_line += '\t' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0]))
+#                w_line += '(' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0])) + ')'
+#                w_line += '\t' + str('%.4f' % l_v[i])
         w_line += '\n'
         w.write(w_line)
     w.write('\n')
@@ -183,9 +183,9 @@ with open(file_write, 'a') as w:
             w_line = key
             for i in range(len(l_m)):
                 w_line += '\t' + str('%.4f' % l_m[i])
-#                w_line += '\t' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0]))
-                w_line += '(' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0])) + ')'
-                w_line += '\t' + str('%.4f' % l_v[i])
+                w_line += '\t' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0]))
+#                w_line += '(' + str(len(l_m) - np.mean(np.where(seq == l_m[i])[0])) + ')'
+#                w_line += '\t' + str('%.4f' % l_v[i])
         w_line += '\n'
         w.write(w_line)
 

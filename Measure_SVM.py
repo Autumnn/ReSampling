@@ -1,7 +1,6 @@
 import os
 import numpy as np
-import xgboost as xgb
-#from xgboost.sklearn import XGBClassifier
+from sklearn import svm, preprocessing, metrics
 from keras.models import load_model
 from imblearn.over_sampling import SMOTE
 import cGANStructure
@@ -12,15 +11,23 @@ path = "KSMOTE_Cross_Folder_npz"
 dirs = os.listdir(path) #Get files in the folder
 First_line = True
 
+
 for Dir in dirs:
     print("Data Set Name: ", Dir)
     dir_path = path + "/" + Dir
     files = os.listdir(dir_path)  # Get files in the folder
-
-    methods = ["xGBoost", "SMOTE", "cGAN", "SMOTE-SMOTE", "cGAN-cGAN", "SMOTE-cGAN", "cGAN-SMOTE"]
+    f_i = 0
+    par_a = []
+    par_b = []
+    methods = ["cGAN-SMOTE", "SVM", "SMOTE", "cGAN", "SMOTE-SMOTE", "cGAN-cGAN", "SMOTE-cGAN"]
     for m in methods:
+        Num_Gamma = 12
+        gamma = np.logspace(-2, 1, Num_Gamma)
+        Num_C = 6
+        C = np.logspace(-1, 4, Num_C)
         Num_Cross_Folders = 5
-        ml_record = metric_list(np.array([1]), np.array([1]), Num_Cross_Folders)
+        ml_record = metric_list(gamma, C, Num_Cross_Folders)
+
         i = 0
         for file in files:
             name = dir_path + '/' + file
@@ -52,7 +59,7 @@ for Dir in dirs:
             Label_test = np.concatenate((Positive_Labels_test, Negative_Labels_test))
             #                print(Label_test)
 
-            if m == "xGBoost":
+            if m == "SVM":
                 Feature_train = Features_train_o
                 Label_train = Labels_train_o
             elif m == "SMOTE":
@@ -138,14 +145,37 @@ for Dir in dirs:
                 sm = SMOTE()
                 Feature_train, Label_train = sm.fit_sample(Re_Features_o, Labels_o)
 
-            clf = xgb.XGBClassifier()
-            clf.fit(Feature_train, Label_train)
-            Label_predict = clf.predict(Feature_test)
-            ml_record.measure(0, 0, i, Label_test, Label_predict)
-            Label_score = clf.predict_proba(Feature_test)
-            ml_record.auc_measure(0, 0, i, Label_test, Label_score[:,1])
+            if f_i == 0:
+                for j in range(Num_Gamma):
+                    for k in range(Num_C):
+                        # print("gamma = ", str(gamma[j]), " C = ", str(C[k]))
+                        clf = svm.SVC(C=C[k], kernel='rbf', gamma=gamma[j])
+                        clf.fit(Feature_train, Label_train)
+                        Label_predict = clf.predict(Feature_test)
+                        ml_record.measure(j, k, i, Label_test, Label_predict)
+                        Label_score = clf.decision_function(Feature_test)
+                        ml_record.auc_measure(j, k, i, Label_test, Label_score)
+            else:
+                for jk in range(len(par_a)):
+                    j = par_a[jk]
+                    k = par_b[jk]
+                    # print("gamma = ", str(gamma[j]), " C = ", str(C[k]))
+                    clf = svm.SVC(C=C[k], kernel='rbf', gamma=gamma[j])
+                    clf.fit(Feature_train, Label_train)
+                    Label_predict = clf.predict(Feature_test)
+                    ml_record.measure(j, k, i, Label_test, Label_predict)
+                    Label_score = clf.decision_function(Feature_test)
+                    ml_record.auc_measure(j, k, i, Label_test, Label_score)
 
             i += 1
 
-        file_wirte = "Result_xGBoost_KSMOTE.txt"
-        ml_record.output(file_wirte, m, Dir)
+        if f_i == 0:
+            par_a, par_b = ml_record.index_find()
+        f_i += 1
+
+        file_wirte = "Result_SVM_KSMOTE.txt"
+        ml_record.output_b(file_wirte, m, Dir, par_a, par_b)
+
+
+
+

@@ -8,7 +8,8 @@ import os
 import cGANStructure
 from imblearn.metrics import geometric_mean_score, specificity_score
 
-path = "UCI_Cross_Folder_npz"
+#path = "UCI_Cross_Folder_npz"
+path = "KSMOTE_Cross_Folder_npz"
 dirs = os.listdir(path) #Get files in the folder
 First_line = True
 
@@ -60,10 +61,10 @@ for Dir in dirs:
         Feature_test = np.concatenate((Positive_Features_test, Negative_Features_test))
         Label_test = np.concatenate((Positive_Labels_test, Negative_Labels_test))
 
-        input_dim, G_dense, D_dense = cGANStructure.Structure(Dir)  # for UCI data
-        #    input_dim = 10
-        #    G_dense = 300
-        #    D_dense = 150
+        #input_dim, G_dense, D_dense = cGANStructure.Structure(Dir)  # for UCI data
+        input_dim = 70
+        G_dense = 90
+        D_dense = 45
 
         Pre_train_epoches = 100
         Train_epoches = 10000

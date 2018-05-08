@@ -1,8 +1,8 @@
 def Structure(name):
 
-    input_dim = 20
-    G_dense = 160
-    D_dense = 80
+    input_dim = 70
+    G_dense = 90
+    D_dense = 45
 
     if name == "Breast":
         input_dim = 70

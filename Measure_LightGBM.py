@@ -8,7 +8,7 @@ import cGANStructure
 from RACOG import RACOG
 from metrics_list import metric_list
 
-path = "UCI_Cross_Folder_npz"
+path = "KSMOTE_Cross_Folder_npz"
 dirs = os.listdir(path) #Get files in the folder
 First_line = True
 
@@ -64,7 +64,7 @@ for Dir in dirs:
                 Train_epoches = 10000
                 Model_name = "cGAN_" + Dir + "_folder_" + str(i) + "_G-dense_" + str(G_dense) + "_pretrain_" + str(
                     Pre_train_epoches) + "_D-dense_" + str(D_dense) + "_epoches_" + str(Train_epoches) + ".h5"
-                Model_path = "UCI_cross_folder_cGAN_Model"
+                Model_path = "KSMOTE_cross_folder_cGAN_Model"
                 model = load_model(Model_path + "/" + Model_name)
                 num_create_samples = Num_Negative_train - Num_Positive_train
                 Noise_Input = np.random.uniform(0, 1, size=[num_create_samples, input_dim])
@@ -85,7 +85,7 @@ for Dir in dirs:
                 Train_epoches = 10000
                 Model_name = "cGAN_" + Dir + "_folder_" + str(i) + "_G-dense_" + str(G_dense) + "_pretrain_" + str(
                     Pre_train_epoches) + "_D-dense_" + str(D_dense) + "_epoches_" + str(Train_epoches) + ".h5"
-                Model_path = "UCI_cross_folder_cGAN_Model"
+                Model_path = "KSMOTE_cross_folder_cGAN_Model"
                 model = load_model(Model_path + "/" + Model_name)
 
                 expand_rate_for_Majority = 0.5
@@ -112,7 +112,7 @@ for Dir in dirs:
                 Train_epoches = 10000
                 Model_name = "cGAN_" + Dir + "_folder_" + str(i) + "_G-dense_" + str(G_dense) + "_pretrain_" + str(
                     Pre_train_epoches) + "_D-dense_" + str(D_dense) + "_epoches_" + str(Train_epoches) + ".h5"
-                Model_path = "UCI_cross_folder_cGAN_Model"
+                Model_path = "KSMOTE_cross_folder_cGAN_Model"
                 model = load_model(Model_path + "/" + Model_name)
                 num_create_minority_samples = Num_Negative_train - Num_Positive_train + num_create_samples
                 Noise_m_Input = np.random.uniform(0, 1, size=[num_create_minority_samples, input_dim])
@@ -126,7 +126,7 @@ for Dir in dirs:
                 Train_epoches = 10000
                 Model_name = "cGAN_" + Dir + "_folder_" + str(i) + "_G-dense_" + str(G_dense) + "_pretrain_" + str(
                     Pre_train_epoches) + "_D-dense_" + str(D_dense) + "_epoches_" + str(Train_epoches) + ".h5"
-                Model_path = "UCI_cross_folder_cGAN_Model"
+                Model_path = "KSMOTE_cross_folder_cGAN_Model"
                 model = load_model(Model_path + "/" + Model_name)
                 expand_rate_for_Majority = 0.5
                 num_create_samples = int(np.ceil(Num_Negative_train * expand_rate_for_Majority))
@@ -147,5 +147,5 @@ for Dir in dirs:
 
             i += 1
 
-        file_wirte = "Result_LightGBM.txt"
+        file_wirte = "Result_LightGBM_KSMOTE.txt"
         ml_record.output(file_wirte, m, Dir)

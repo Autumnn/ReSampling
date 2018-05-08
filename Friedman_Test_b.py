@@ -2,7 +2,7 @@ import numpy as np
 import scipy.stats as stats
 
 
-file = "Result_b.txt"
+file = "Result_SVM.txt"
 #    file = "Result_a_" + str(f_i) + ".txt"
 i = 0
 with open(file, "r") as r:
